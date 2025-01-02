@@ -23,6 +23,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico").permitAll()
                 .requestMatchers("/login", "/register", "/error").permitAll()
+                .requestMatchers("/api/loan-items/**").authenticated()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
