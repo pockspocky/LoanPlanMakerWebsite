@@ -1,714 +1,106 @@
 <!DOCTYPE html>
-<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>仪表板</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-        }
-        .navbar {
-            background-color: #333;
-            padding: 1rem;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .navbar h1 {
-            margin: 0;
-            font-size: 1.5rem;
-        }
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            background-color: #007bff;
-        }
-        .navbar a:hover {
-            background-color: #0056b3;
-        }
-        .content {
-            padding: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .welcome-message {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-        }
-        
-        /* 标签页样式 */
-        .tabs {
-            margin-top: 2rem;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        .tab-header {
-            display: flex;
-            background: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
-            padding: 0.5rem 1rem 0;
-        }
-        .tab-button {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            background: none;
-            cursor: pointer;
-            margin-right: 0.5rem;
-            border-radius: 4px 4px 0 0;
-            font-size: 0.9rem;
-            color: #666;
-            position: relative;
-        }
-        .tab-button.active {
-            background: white;
-            color: #007bff;
-            border: 1px solid #dee2e6;
-            border-bottom: none;
-        }
-        .tab-button:hover:not(.active) {
-            background: #e9ecef;
-        }
-        .tab-content {
-            padding: 2rem;
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        /* 新标签按钮 */
-        .new-tab-button {
-            padding: 0.5rem;
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #007bff;
-            font-size: 1.2rem;
-            margin-left: 0.5rem;
-        }
-        .new-tab-button:hover {
-            color: #0056b3;
-        }
-        
-        /* 贷款管理相关样式 */
-        .loan-management {
-            padding: 1rem;
-        }
-        
-        .filter-btn {
-            padding: 0.5rem 1rem;
-            margin-right: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background: white;
-            cursor: pointer;
-        }
-        
-        .filter-btn.active {
-            background: #007bff;
-            color: white;
-            border-color: #007bff;
-        }
-        
-        .action-btn {
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            margin-right: 0.25rem;
-        }
-        
-        .action-btn.approve {
-            background: #28a745;
-            color: white;
-        }
-        
-        .action-btn.reject {
-            background: #dc3545;
-            color: white;
-        }
-        
-        /* 新增贷款按钮样式 */
-        .action-btn.add-loan {
-            background: #17a2b8;
-            color: white;
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-        }
-        
-        /* 弹窗样式 */
-        .dialog-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        
-        .dialog-content {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .dialog-content h3 {
-            margin-top: 0;
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-group {
-            margin-bottom: 1rem;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #666;
-        }
-        
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        
-        .dialog-buttons {
-            margin-top: 1.5rem;
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-        }
-
-        /* 贷款事项卡片样式 */
-        .loan-items {
-            display: grid;
-            grid-gap: 1rem;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        }
-
-        .loan-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            overflow: hidden;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .loan-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .loan-card-header {
-            padding: 1rem;
-            background: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .loan-id {
-            font-weight: 500;
-            color: #495057;
-        }
-
-        .loan-status {
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.875rem;
-        }
-
-        .loan-status.pending {
-            background: #ffd700;
-            color: #856404;
-        }
-
-        .loan-status.approved {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .loan-status.rejected {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .loan-card-body {
-            padding: 1rem;
-        }
-
-        .loan-info {
-            margin-bottom: 1rem;
-        }
-
-        .info-row {
-            display: flex;
-            margin-bottom: 0.5rem;
-        }
-
-        .info-label {
-            width: 80px;
-            color: #6c757d;
-            flex-shrink: 0;
-        }
-
-        .info-value {
-            color: #212529;
-            font-weight: 500;
-        }
-
-        .loan-actions {
-            display: flex;
-            gap: 0.5rem;
-            justify-content: flex-end;
-        }
-    </style>
+    <title>贷款管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
-    <div class="navbar">
-        <h1>管理系统</h1>
-        <a th:href="@{/logout}">退出登录</a>
-    </div>
-    <div class="content">
-        <div class="welcome-message">
-            <h2>欢迎回来，<span th:text="${#authentication.name}">用户</span>！</h2>
-            <p>当前时间：<span th:text="${#dates.format(#dates.createNow(), 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 00:00:00</span></p>
-        </div>
+    <div class="container mt-4">
+        <h2>贷款事项管理</h2>
         
-        <!-- 标签页容器 -->
-        <div class="tabs">
-            <div class="tab-header">
-                <!-- 贷款事项管理标签页 -->
-                <button class="tab-button active">贷款事项管理</button>
-                <button class="new-tab-button" onclick="addNewTab()">+ 新建标签页</button>
-            </div>
-            
-            <!-- 标签页内容区域 -->
-            <div id="tab-contents">
-                <!-- 贷款事项管理内容 -->
-                <div class="tab-content active">
-                    <h3>贷款事项管理</h3>
-                    <div class="loan-management">
-                        <div style="margin-bottom: 1rem;">
-                            <button onclick="showAddLoanDialog()" class="action-btn add-loan">
-                                <span style="margin-right: 4px;">+</span> 新增贷款
-                            </button>
-                        </div>
-                        
-                        <div class="loan-filters" style="margin-bottom: 1rem;">
-                            <button onclick="filterLoans('all')" class="filter-btn active">全部</button>
-                            <button onclick="filterLoans('pending')" class="filter-btn">待处理</button>
-                            <button onclick="filterLoans('approved')" class="filter-btn">已批准</button>
-                            <button onclick="filterLoans('rejected')" class="filter-btn">已拒绝</button>
-                        </div>
+        <!-- 新增贷款按钮 -->
+        <button type="button" class="btn btn-primary mb-3" onclick="window.location.href='/loan/add'">
+            <i class="bi bi-plus"></i> 新增贷款
+        </button>
 
-                        <!-- 贷款事项列表 -->
-                        <div class="loan-items">
-                            <!-- 这里将动态添加贷款事项 -->
-                        </div>
-                    </div>
-                </div>
+        <!-- Debug 信息 -->
+        <div class="alert alert-info">
+            <p>Debug 信息:</p>
+            <p th:text="${'Loans: ' + loans}"></p>
+        </div>
+
+        <!-- 贷款列表容器 -->
+        <div id="loanList" class="row">
+            <!-- 加载提示 -->
+            <div class="col-12">
+                <div class="alert alert-info">加载中...</div>
             </div>
         </div>
     </div>
 
-    <div id="addLoanDialog" class="dialog-overlay" style="display: none;">
-        <div class="dialog-content">
-            <h3>新增贷款申请</h3>
-            <form id="addLoanForm" onsubmit="submitLoanForm(event)">
-                <div class="form-group">
-                    <label for="loanAmount">贷款金额：</label>
-                    <input type="number" 
-                           id="loanAmount" 
-                           name="loanAmount" 
-                           min="1000" 
-                           step="1000" 
-                           required
-                           placeholder="请输入贷款金额">
-                </div>
-                <div class="form-group">
-                    <label for="loanDeadline">贷款期限（月）：</label>
-                    <input type="number" 
-                           id="loanDeadline" 
-                           name="loanDeadline" 
-                           min="12" 
-                           max="360" 
-                           step="12" 
-                           required
-                           placeholder="请输入贷款期限">
-                </div>
-                <div class="form-group">
-                    <label for="yearlyInterestRate">年利率（%）：</label>
-                    <input type="number" 
-                           id="yearlyInterestRate" 
-                           name="yearlyInterestRate" 
-                           min="0.1" 
-                           max="30" 
-                           step="0.1" 
-                           required
-                           placeholder="请输入年利率">
-                </div>
-                <div class="form-group">
-                    <label for="paybackMethod">还款方式：</label>
-                    <select id="paybackMethod" name="paybackMethod" required>
-                        <option value="">请选择还款方式</option>
-                        <option value="equal_installment">等额本息</option>
-                        <option value="equal_principal">等额本金</option>
-                        <option value="one_time">一次性还本付息</option>
-                    </select>
-                </div>
-                <div class="dialog-buttons">
-                    <button type="submit" class="action-btn approve">提交申请</button>
-                    <button type="button" class="action-btn reject" onclick="hideAddLoanDialog()">取消</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- 自定义 JavaScript -->
     <script>
-        // 定义可用的标签页类型
-        const tabTypes = [
-            {
-                id: 'loan',
-                title: '贷款事项管理',
-                content: `
-                    <div class="tab-content">
-                        <h3>贷款事项管理</h3>
-                        <div class="loan-management">
-                            <div style="margin-bottom: 1rem;">
-                                <button onclick="showAddLoanDialog()" class="action-btn add-loan">
-                                    <span style="margin-right: 4px;">+</span> 新增贷款
-                                </button>
-                            </div>
-                            
-                            <div class="loan-filters" style="margin-bottom: 1rem;">
-                                <button onclick="filterLoans('all')" class="filter-btn active">全部</button>
-                                <button onclick="filterLoans('pending')" class="filter-btn">待处理</button>
-                                <button onclick="filterLoans('approved')" class="filter-btn">已批准</button>
-                                <button onclick="filterLoans('rejected')" class="filter-btn">已拒绝</button>
-                            </div>
-
-                            <!-- 贷款事项列表 -->
-                            <div class="loan-items">
-                                <!-- 这里将动态添加贷款事项 -->
-                            </div>
-                        </div>
-                    </div>
-                `
-            }
-        ];
-
-        // 添加新标签页
-        function addNewTab() {
-            const header = document.querySelector('.tab-header');
-            const tabContents = document.getElementById('tab-contents');
-            
-            // 创建选择菜单
-            const menu = document.createElement('div');
-            menu.className = 'tab-type-menu';
-            menu.style.position = 'absolute';
-            menu.style.backgroundColor = 'white';
-            menu.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-            menu.style.borderRadius = '4px';
-            menu.style.padding = '0.5rem';
-            menu.style.zIndex = '1000';
-            
-            tabTypes.forEach(type => {
-                const option = document.createElement('div');
-                option.className = 'tab-type-option';
-                option.style.padding = '0.5rem 1rem';
-                option.style.cursor = 'pointer';
-                option.style.borderRadius = '4px';
-                option.textContent = type.title;
-                
-                option.addEventListener('mouseover', () => {
-                    option.style.backgroundColor = '#f0f0f0';
-                });
-                
-                option.addEventListener('mouseout', () => {
-                    option.style.backgroundColor = 'transparent';
-                });
-                
-                option.onclick = () => {
-                    createTab(type);
-                    menu.remove();
-                };
-                
-                menu.appendChild(option);
-            });
-            
-            // 显示菜单
-            const button = document.querySelector('.new-tab-button');
-            const rect = button.getBoundingClientRect();
-            menu.style.top = rect.bottom + 'px';
-            menu.style.left = rect.left + 'px';
-            document.body.appendChild(menu);
-            
-            // 点击其他地方关闭菜单
-            document.addEventListener('click', (e) => {
-                if (!menu.contains(e.target) && e.target !== button) {
-                    menu.remove();
-                }
-            });
-        }
-
-        // 创建新标签页
-        function createTab(type) {
-            const header = document.querySelector('.tab-header');
-            const tabContents = document.getElementById('tab-contents');
-            
-            // 移除其他标签页的 active 类
-            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            // 创建标签按钮
-            const newButton = document.createElement('button');
-            newButton.className = 'tab-button active';  // 添加 active 类
-            newButton.textContent = type.title;
-            const index = document.querySelectorAll('.tab-button').length;
-            newButton.onclick = () => switchTab(index);
-            
-            // 创建内容
-            const newContent = document.createElement('div');
-            newContent.className = 'tab-content active';  // 添加 active 类
-            newContent.innerHTML = type.content;
-            
-            // 插入新元素
-            header.insertBefore(newButton, document.querySelector('.new-tab-button'));
-            tabContents.appendChild(newContent);
-        }
-
-        // 标签页切换功能
-        function switchTab(index) {
-            const buttons = document.querySelectorAll('.tab-button');
-            const contents = document.querySelectorAll('.tab-content');
-            
-            buttons.forEach(button => button.classList.remove('active'));
-            contents.forEach(content => content.classList.remove('active'));
-            
-            if (buttons[index]) {
-                buttons[index].classList.add('active');
-                contents[index].classList.add('active');
-            }
-        }
-
-        // 贷款过滤功能
-        function filterLoans(status) {
-            const buttons = document.querySelectorAll('.filter-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // 发送过滤请求到后端
-            fetch(`/api/loans?status=${status}`)
-                .then(response => response.json())
-                .then(loans => {
-                    const loanItems = document.querySelector('.loan-items');
-                    loanItems.innerHTML = '';
-                    loans.forEach(loan => addLoanCard(loan));
-                })
-                .catch(error => {
-                    console.error('Error filtering loans:', error);
-                    alert('过滤贷款列表失败');
-                });
-        }
-
-        // 页面加载完成后自动创建贷款事项管理标签页
-        document.addEventListener('DOMContentLoaded', function() {
-            // 获取贷款事项管理的标签页类型
-            const loanTabType = tabTypes.find(type => type.id === 'loan');
-            if (loanTabType) {
-                // 创建标签页
-                const header = document.querySelector('.tab-header');
-                const tabContents = document.getElementById('tab-contents');
-                
-                // 创建标签按钮
-                const newButton = document.createElement('button');
-                newButton.className = 'tab-button active';  // 添加 active 类
-                newButton.textContent = loanTabType.title;
-                
-                // 创建内容
-                const newContent = document.createElement('div');
-                newContent.className = 'tab-content active';  // 添加 active 类
-                newContent.innerHTML = loanTabType.content;
-                
-                // 插入新元素
-                header.insertBefore(newButton, document.querySelector('.new-tab-button'));
-                tabContents.appendChild(newContent);
-            }
-        });
-
-        // 显示新增贷款弹窗
-        function showAddLoanDialog() {
-            const dialog = document.getElementById('addLoanDialog');
-            if (dialog) {
-                dialog.style.display = 'flex';
-            } else {
-                console.error('Dialog element not found');
-            }
-        }
+    document.addEventListener('DOMContentLoaded', function() {
+        const loanList = document.getElementById('loanList');
         
-        // 隐藏新增贷款弹窗
-        function hideAddLoanDialog() {
-            const dialog = document.getElementById('addLoanDialog');
-            if (dialog) {
-                dialog.style.display = 'none';
-            }
-        }
-        
-        // 修改提交贷款申请表单函数
-        function submitLoanForm(event) {
-            event.preventDefault();
-            
-            const formData = {
-                loanAmount: parseFloat(document.getElementById('loanAmount').value),
-                loanDeadline: parseInt(document.getElementById('loanDeadline').value),
-                yearlyInterestRate: parseFloat(document.getElementById('yearlyInterestRate').value),
-                paybackMethod: document.getElementById('paybackMethod').value
-            };
-            
-            // 添加前导斜杠
-            fetch('/api/loan-items', {  // 确保路径以斜杠开头
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            })
-            .then(async response => {
+        // 获取贷款列表
+        fetch('/api/loan-items/user/current')
+            .then(response => {
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('响应状态：', response.status);
-                    console.error('错误信息：', errorText);
-                    throw new Error(`提交失败 (${response.status}): ${errorText}`);
+                    throw new Error('网络响应不正常');
                 }
                 return response.json();
             })
             .then(data => {
-                console.log('提交成功，返回数据：', data);
-                addLoanCard(data);
-                
-                document.getElementById('addLoanForm').reset();
-                hideAddLoanDialog();
-                alert('贷款申请已提交！');
+                console.log('获取到的贷款数据:', data);
+                if (Array.isArray(data) && data.length > 0) {
+                    loanList.innerHTML = data.map(loan => `
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">${loan.loanName}</h5>
+                                    <div class="card-text">
+                                        <p><strong>贷款金额：</strong> ¥${loan.loanAmount}</p>
+                                        <p><strong>贷款期限：</strong> ${loan.loanDeadline}个月</p>
+                                        <p><strong>年利率：</strong> ${loan.yearlyInterestRate}%</p>
+                                        <p><strong>还款方式：</strong> ${loan.paybackMethod}</p>
+                                        <p><strong>创建时间：</strong> ${new Date(loan.createdAt).toLocaleString()}</p>
+                                    </div>
+                                    <button onclick="deleteLoan('${loan.id}')" 
+                                            class="btn btn-danger btn-sm">
+                                        <i class="bi bi-trash"></i> 删除
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    loanList.innerHTML = '<div class="col-12"><div class="alert alert-info">暂无贷款事项</div></div>';
+                }
             })
             .catch(error => {
-                console.error('提交错误：', error);
-                alert('提交失败：' + error.message);
+                console.error('获取贷款数据失败:', error);
+                loanList.innerHTML = '<div class="col-12"><div class="alert alert-danger">加载贷款数据失败</div></div>';
+            });
+    });
+
+    function deleteLoan(loanItemId) {
+        if (confirm('确定要删除这个贷款事项吗？')) {
+            fetch(`/api/loan-items/${loanItemId}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('删除失败');
+                }
+                return response.ok;
+            })
+            .then(data => {
+                alert('删除成功');
+                window.location.reload(); // 刷新页面
+            })
+            .catch(error => {
+                console.error('删除失败:', error);
+                alert('删除失败，请重试');
             });
         }
-
-        // 修改加载贷款列表函数
-        function loadLoanList() {
-            fetch('/api/loan-items/user/current')  // 确保路径以斜杠开头
-                .then(response => response.json())
-                .then(loans => {
-                    const loanItems = document.querySelector('.loan-items');
-                    loanItems.innerHTML = '';
-                    loans.forEach(loan => addLoanCard(loan));
-                })
-                .catch(error => {
-                    console.error('Error loading loans:', error);
-                    alert('加载贷款列表失败');
-                });
-        }
-
-        // 添加删除贷款事项的函数
-        function deleteLoanItem(loanItemId) {
-            if (confirm('确定要删除这个贷款事项吗？')) {
-                fetch(`/api/loan-items/${loanItemId}`, {  // 确保路径以斜杠开头
-                    method: 'DELETE'
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('删除失败');
-                    }
-                    loadLoanList();
-                    alert('删除成功！');
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('删除失败：' + error.message);
-                });
-            }
-        }
-
-        // 修改添加贷款卡片的函数，添加删除按钮
-        function addLoanCard(loanData) {
-            const loanItems = document.querySelector('.loan-items');
-            const card = document.createElement('div');
-            card.className = 'loan-card';
-            card.innerHTML = `
-                <div class="loan-card-header">
-                    <span class="loan-id">申请编号：${loanData.id || '新建'}</span>
-                    <span class="loan-status pending">待处理</span>
-                </div>
-                <div class="loan-card-body">
-                    <div class="loan-info">
-                        <div class="info-row">
-                            <span class="info-label">贷款金额：</span>
-                            <span class="info-value">¥${loanData.loanAmount.toLocaleString()}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">贷款期限：</span>
-                            <span class="info-value">${loanData.loanDeadline}个月</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">年利率：</span>
-                            <span class="info-value">${loanData.yearlyInterestRate}%</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">还款方式：</span>
-                            <span class="info-value">${getPaybackMethodText(loanData.paybackMethod)}</span>
-                        </div>
-                    </div>
-                    <div class="loan-actions">
-                        <button class="action-btn reject" onclick="deleteLoanItem('${loanData.id}')">删除</button>
-                    </div>
-                </div>
-            `;
-            loanItems.appendChild(card);
-        }
-
-        // 添加一个辅助函数来转换还款方式的显示文本
-        function getPaybackMethodText(method) {
-            const methodMap = {
-                'equal_installment': '等额本息',
-                'equal_principal': '等额本金',
-                'one_time': '一次性还本付息'
-            };
-            return methodMap[method] || method;
-        }
+    }
     </script>
 </body>
+</html> 
 </html> 

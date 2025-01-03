@@ -1,6 +1,7 @@
 package com.example.hello.controller;
 
 import com.example.hello.dto.RegisterRequest;
+import com.example.hello.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class AuthController {
 
     @Autowired
-    private InMemoryUserDetailsManager userDetailsManager;
+    private UserService userService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -39,27 +40,17 @@ public class AuthController {
 
     @PostMapping("/register")
     public String registerUser(@ModelAttribute RegisterRequest registerRequest, Model model) {
-        // 验证密码是否匹配
         if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
             model.addAttribute("error", "两次输入的密码不匹配");
             return "register";
         }
 
-        // 检查用户名是否已存在
         try {
-            userDetailsManager.loadUserByUsername(registerRequest.getUsername());
+            userService.createUser(registerRequest.getUsername(), registerRequest.getPassword());
+            return "redirect:/login?registered";
+        } catch (Exception e) {
             model.addAttribute("error", "用户名已存在");
             return "register";
-        } catch (Exception e) {
-            // 用户名不存在，可以创建新用户
-            UserDetails user = User.builder()
-                .username(registerRequest.getUsername())
-                .password(registerRequest.getPassword())
-                .roles("USER")
-                .build();
-            
-            userDetailsManager.createUser(user);
-            return "redirect:/login?registered";
         }
     }
 } 

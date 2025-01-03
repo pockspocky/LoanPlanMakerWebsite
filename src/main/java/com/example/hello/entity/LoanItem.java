@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "loan_items")
 @Data
 @EntityListeners(AuditingEntityListener.class)
 public class LoanItem {
@@ -17,16 +18,32 @@ public class LoanItem {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     
+    @Column(nullable = false)
     private String userId;
+    
+    @Column(nullable = false)
+    private String loanName;
+    
+    @Column(nullable = false)
     private BigDecimal loanAmount;
+    
+    @Column(nullable = false)
     private Integer loanDeadline;
+    
+    @Column(nullable = false)
     private BigDecimal yearlyInterestRate;
+    
+    @Column(nullable = false)
     private String paybackMethod;
+    
+    @Column(nullable = false)
     private String status;
     
     @CreatedDate
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
     
     @LastModifiedDate
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 } 
