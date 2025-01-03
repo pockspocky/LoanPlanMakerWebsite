@@ -1,62 +1,106 @@
 <!DOCTYPE html>
-<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>仪表板</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-        }
-        .navbar {
-            background-color: #333;
-            padding: 1rem;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .navbar h1 {
-            margin: 0;
-            font-size: 1.5rem;
-        }
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            background-color: #007bff;
-        }
-        .navbar a:hover {
-            background-color: #0056b3;
-        }
-        .content {
-            padding: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .welcome-message {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-        }
-    </style>
+    <title>贷款管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
-    <div class="navbar">
-        <h1>管理系统</h1>
-        <a th:href="@{/logout}">退出登录</a>
-    </div>
-    <div class="content">
-        <div class="welcome-message">
-            <h2>欢迎回来，<span th:text="${#authentication.name}">用户</span>！</h2>
-            <p>当前时间：<span th:text="${#dates.format(#dates.createNow(), 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 00:00:00</span></p>
+    <div class="container mt-4">
+        <h2>贷款事项管理</h2>
+        
+        <!-- 新增贷款按钮 -->
+        <button type="button" class="btn btn-primary mb-3" onclick="window.location.href='/loan/add'">
+            <i class="bi bi-plus"></i> 新增贷款
+        </button>
+
+        <!-- Debug 信息 -->
+        <div class="alert alert-info">
+            <p>Debug 信息:</p>
+            <p th:text="${'Loans: ' + loans}"></p>
+        </div>
+
+        <!-- 贷款列表容器 -->
+        <div id="loanList" class="row">
+            <!-- 加载提示 -->
+            <div class="col-12">
+                <div class="alert alert-info">加载中...</div>
+            </div>
         </div>
     </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- 自定义 JavaScript -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loanList = document.getElementById('loanList');
+        
+        // 获取贷款列表
+        fetch('/api/loan-items/user/current')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('网络响应不正常');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('获取到的贷款数据:', data);
+                if (Array.isArray(data) && data.length > 0) {
+                    loanList.innerHTML = data.map(loan => `
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">${loan.loanName}</h5>
+                                    <div class="card-text">
+                                        <p><strong>贷款金额：</strong> ¥${loan.loanAmount}</p>
+                                        <p><strong>贷款期限：</strong> ${loan.loanDeadline}个月</p>
+                                        <p><strong>年利率：</strong> ${loan.yearlyInterestRate}%</p>
+                                        <p><strong>还款方式：</strong> ${loan.paybackMethod}</p>
+                                        <p><strong>创建时间：</strong> ${new Date(loan.createdAt).toLocaleString()}</p>
+                                    </div>
+                                    <button onclick="deleteLoan('${loan.id}')" 
+                                            class="btn btn-danger btn-sm">
+                                        <i class="bi bi-trash"></i> 删除
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    loanList.innerHTML = '<div class="col-12"><div class="alert alert-info">暂无贷款事项</div></div>';
+                }
+            })
+            .catch(error => {
+                console.error('获取贷款数据失败:', error);
+                loanList.innerHTML = '<div class="col-12"><div class="alert alert-danger">加载贷款数据失败</div></div>';
+            });
+    });
+
+    function deleteLoan(loanItemId) {
+        if (confirm('确定要删除这个贷款事项吗？')) {
+            fetch(`/api/loan-items/${loanItemId}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('删除失败');
+                }
+                return response.ok;
+            })
+            .then(data => {
+                alert('删除成功');
+                window.location.reload(); // 刷新页面
+            })
+            .catch(error => {
+                console.error('删除失败:', error);
+                alert('删除失败，请重试');
+            });
+        }
+    }
+    </script>
 </body>
+</html> 
 </html> 

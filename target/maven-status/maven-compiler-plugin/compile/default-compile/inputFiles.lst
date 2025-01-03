@@ -1,5 +1,15 @@
 /home/devbox/project/src/main/java/com/example/hello/HelloApplication.java
+/home/devbox/project/src/main/java/com/example/hello/config/JpaConfig.java
+/home/devbox/project/src/main/java/com/example/hello/config/PasswordEncoderConfig.java
 /home/devbox/project/src/main/java/com/example/hello/config/SecurityConfig.java
 /home/devbox/project/src/main/java/com/example/hello/controller/AuthController.java
 /home/devbox/project/src/main/java/com/example/hello/controller/DashboardController.java
+/home/devbox/project/src/main/java/com/example/hello/controller/LoanItemController.java
+/home/devbox/project/src/main/java/com/example/hello/dto/LoanItemRequest.java
 /home/devbox/project/src/main/java/com/example/hello/dto/RegisterRequest.java
+/home/devbox/project/src/main/java/com/example/hello/entity/LoanItem.java
+/home/devbox/project/src/main/java/com/example/hello/entity/User.java
+/home/devbox/project/src/main/java/com/example/hello/repository/LoanItemRepository.java
+/home/devbox/project/src/main/java/com/example/hello/repository/UserRepository.java
+/home/devbox/project/src/main/java/com/example/hello/service/LoanItemService.java
+/home/devbox/project/src/main/java/com/example/hello/service/UserService.java
