@@ -10,4 +10,9 @@ public class DashboardController {
     public String dashboard() {
         return "dashboard";
     }
+
+    @GetMapping("/loan/add")
+    public String addLoan() {
+        return "loan-add";
+    }
 } 

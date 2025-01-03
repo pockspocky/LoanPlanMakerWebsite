@@ -58,6 +58,23 @@ public class LoanItemController {
         }
     }
     
+    @GetMapping("/user/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getUserLoanItems(@PathVariable String username) {
+        try {
+            logger.info("Admin fetching loan items for user: {}", username);
+            
+            List<LoanItem> items = loanItemService.getLoanItemsByUserId(username);
+            logger.info("Found {} loan items for user {}", items.size(), username);
+            
+            return ResponseEntity.ok(items);
+        } catch (Exception e) {
+            logger.error("Error fetching loan items for user: " + username, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error fetching loan items: " + e.getMessage());
+        }
+    }
+    
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteLoanItem(@PathVariable String id, Authentication authentication) {
         try {

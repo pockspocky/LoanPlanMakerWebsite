@@ -5,6 +5,7 @@
 /home/devbox/project/src/main/java/com/example/hello/controller/AuthController.java
 /home/devbox/project/src/main/java/com/example/hello/controller/DashboardController.java
 /home/devbox/project/src/main/java/com/example/hello/controller/LoanItemController.java
+/home/devbox/project/src/main/java/com/example/hello/controller/UserManagementController.java
 /home/devbox/project/src/main/java/com/example/hello/dto/LoanItemRequest.java
 /home/devbox/project/src/main/java/com/example/hello/dto/RegisterRequest.java
 /home/devbox/project/src/main/java/com/example/hello/entity/LoanItem.java

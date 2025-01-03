@@ -58,7 +58,7 @@ public class LoanItemService {
             
         System.out.println("找到贷款项目 - ID: " + id + ", 所有者: " + loanItem.getUserId());
         
-        System.out.println("检查用户权限");
+        // 检查用户权限（管理员可以删除任何贷款）
         if (!userId.equals("admin") && !loanItem.getUserId().equals(userId)) {
             System.out.println("用户无权删除此贷款项目 - ID: " + id + ", 请求用户: " + userId + ", 所有者: " + loanItem.getUserId());
             throw new RuntimeException("无权删除此贷款事项");
