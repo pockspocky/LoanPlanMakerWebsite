@@ -38,9 +38,43 @@
             border: 2px solid #dee2e6;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             transition: box-shadow 0.3s ease;
+            margin-bottom: 1.5rem;
         }
         .card:hover {
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+        .card-title {
+            color: #2c3e50;
+            margin-bottom: 1.25rem;
+            font-weight: 600;
+        }
+        .card-text p {
+            margin-bottom: 0.75rem;
+            color: #495057;
+        }
+        .card-text strong {
+            color: #343a40;
+            min-width: 90px;
+            display: inline-block;
+        }
+        .badge {
+            padding: 0.5em 0.75em;
+            font-weight: 500;
+        }
+        .btn-danger {
+            margin-top: 0;
+        }
+        .btn-success {
+            margin-top: 0;
+        }
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
     </style>
 </head>
@@ -62,27 +96,36 @@
     </div>
 
     <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>贷款事项管理</h2>
-            <div>
-                <!-- 管理员专用按钮 -->
-                <a th:if="${#authentication.name == 'admin'}" 
-                   href="/user-management" 
-                   class="btn btn-info me-2">
-                    <i class="bi bi-people"></i> 用户管理
-                </a>
-                <!-- 新增贷款按钮 -->
-                <a href="/loan/add" class="btn btn-primary">
-                    <i class="bi bi-plus"></i> 新增贷款
-                </a>
+        <!-- 标题和按钮区域 -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2>贷款事项管理</h2>
+                    <div>
+                        <!-- 管理员专用按钮 -->
+                        <a th:if="${#authentication.name == 'admin'}" 
+                           href="/user-management" 
+                           class="btn btn-info me-2">
+                            <i class="bi bi-people"></i> 用户管理
+                        </a>
+                        <!-- 新增贷款按钮 -->
+                        <a href="/loan/add" class="btn btn-primary">
+                            <i class="bi bi-plus"></i> 新增贷款
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
         
-        <!-- 贷款列表容器 -->
-        <div id="loanList" class="row">
-            <!-- 加载提示 -->
+        <!-- 贷款列表区域 -->
+        <div class="row">
             <div class="col-12">
-                <div class="alert alert-info">加载中...</div>
+                <div id="loanList" class="row">
+                    <!-- 加载提示 -->
+                    <div class="col-12">
+                        <div class="alert alert-info">加载中...</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -115,6 +158,8 @@
                                         <p><strong>贷款金额：</strong> ¥${loan.loanAmount.toLocaleString('zh-CN')}</p>
                                         <p><strong>贷款期限：</strong> ${loan.loanDeadline}个月</p>
                                         <p><strong>年利率：</strong> ${loan.yearlyInterestRate}%</p>
+                                        <p><strong>贷款银行：</strong> ${loan.loanBank}</p>
+                                        <p><strong>贷款类型：</strong> ${loan.loanType}</p>
                                         <p><strong>还款方式：</strong> ${
                                             loan.paybackMethod === '随借随还' ? '<span class="badge bg-success">随借随还</span>' :
                                             loan.paybackMethod === '等额本息' ? '<span class="badge bg-primary">等额本息</span>' :
@@ -125,10 +170,16 @@
                                         }</p>
                                         <p><strong>创建时间：</strong> ${new Date(loan.createdAt).toLocaleString()}</p>
                                     </div>
-                                    <button onclick="deleteLoan('${loan.id}')" 
-                                            class="btn btn-danger btn-sm">
-                                        <i class="bi bi-trash"></i> 删除
-                                    </button>
+                                    <div class="card-actions">
+                                        <a href="/loan/${loan.id}/details"
+                                                class="btn btn-success btn-sm">
+                                            <i class="bi bi-info-circle"></i> 具体信息
+                                        </a>
+                                        <button onclick="deleteLoan('${loan.id}')" 
+                                                class="btn btn-danger btn-sm">
+                                            <i class="bi bi-trash"></i> 删除
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

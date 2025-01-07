@@ -33,8 +33,7 @@ public class SecurityConfig {
                 .requestMatchers("/login", "/register", "/error").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/user-management", "/api/users/**", "/user/*/loans").hasRole("ADMIN")
-                .requestMatchers("/api/loan-items/user/current").authenticated()
-                .requestMatchers("/api/loan-items/**").hasRole("ADMIN")
+                .requestMatchers("/api/loan-items/**").authenticated()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

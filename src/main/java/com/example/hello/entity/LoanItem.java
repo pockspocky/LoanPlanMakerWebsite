@@ -37,6 +37,12 @@ public class LoanItem {
     private String paybackMethod;
     
     @Column(nullable = false)
+    private String loanBank;
+    
+    @Column(nullable = false)
+    private String loanType;
+    
+    @Column(nullable = false)
     private String status;
     
     @CreatedDate

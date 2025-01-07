@@ -35,6 +35,15 @@
         .card:hover {
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
+        .card-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .btn-success {
+            margin-top: 0;
+        }
     </style>
 </head>
 <body>
@@ -100,6 +109,8 @@
                                             <p><strong>贷款金额：</strong> ¥${loan.loanAmount.toLocaleString('zh-CN')}</p>
                                             <p><strong>贷款期限：</strong> ${loan.loanDeadline}个月</p>
                                             <p><strong>年利率：</strong> ${loan.yearlyInterestRate}%</p>
+                                            <p><strong>贷款银行：</strong> ${loan.loanBank}</p>
+                                            <p><strong>贷款类型：</strong> ${loan.loanType}</p>
                                             <p><strong>还款方式：</strong> ${
                                                 loan.paybackMethod === '随借随还' ? '<span class="badge bg-success">随借随还</span>' :
                                                 loan.paybackMethod === '等额本息' ? '<span class="badge bg-primary">等额本息</span>' :
@@ -109,6 +120,12 @@
                                                 loan.paybackMethod
                                             }</p>
                                             <p><strong>创建时间：</strong> ${new Date(loan.createdAt).toLocaleString()}</p>
+                                        </div>
+                                        <div class="card-actions">
+                                            <a href="/loan/${loan.id}/details"
+                                                    class="btn btn-success btn-sm">
+                                                <i class="bi bi-info-circle"></i> 具体信息
+                                            </a>
                                         </div>
                                     </div>
                                 </div>

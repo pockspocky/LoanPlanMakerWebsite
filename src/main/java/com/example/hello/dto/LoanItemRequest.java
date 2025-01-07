@@ -10,6 +10,8 @@ public class LoanItemRequest {
     private Integer loanDeadline;
     private BigDecimal yearlyInterestRate;
     private String paybackMethod;
+    private String loanBank;
+    private String loanType;
 
     public String getLoanName() {
         return loanName;
