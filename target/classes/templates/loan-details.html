@@ -300,39 +300,30 @@
                     <td>${payment.monthIndex}</td>
                     <td>
                         ¥${payment.paymentAmount ? payment.paymentAmount.toLocaleString('zh-CN') : '0.00'}
-                        <button class="btn btn-sm btn-primary payment-btn" 
-                                onclick="showPaymentModal(${payment.monthIndex})"
-                                ${payment.status === 'PAID' ? 'disabled' : ''}>
-                            <i class="bi bi-plus-circle"></i> 还款
-                        </button>
+                        ${renderPaymentButton(payment)}
                     </td>
                     <td>¥${payment.plannedAmount ? payment.plannedAmount.toLocaleString('zh-CN') : '0.00'}</td>
-                    <td class="status-cell">
-                        <span class="badge ${getStatusBadgeClass(payment.status)} status-badge">
-                            ${payment.statusDescription}
-                        </span>
-                        <button class="btn btn-sm btn-danger overdue-btn" 
-                                onclick="toggleOverdueStatus(${payment.monthIndex}, '${payment.status}')"
-                                ${payment.status === 'PAID' ? 'disabled' : ''}>
-                            <i class="bi bi-exclamation-triangle"></i>
-                            ${payment.status === 'OVERDUE' ? '取消逾期' : '标记逾期'}
-                        </button>
-                    </td>
+                    ${renderStatusCell(payment)}
                 </tr>
             `).join('');
         }
 
+        // 定义状态常量
+        const STATUS = {
+            OVERDUE: 'OVERDUE',
+            PENDING: 'PENDING',
+            PAID: 'PAID'
+        };
+
+        // 定义状态样式映射
+        const STATUS_STYLES = {
+            [STATUS.OVERDUE]: 'bg-danger',
+            [STATUS.PENDING]: 'bg-warning',
+            [STATUS.PAID]: 'bg-success'
+        };
+
         function getStatusBadgeClass(status) {
-            switch (status) {
-                case 'OVERDUE':
-                    return 'bg-danger';
-                case 'PENDING':
-                    return 'bg-warning';
-                case 'PAID':
-                    return 'bg-success';
-                default:
-                    return 'bg-warning';  // 默认使用警告色（待还）
-            }
+            return STATUS_STYLES[status] || STATUS_STYLES[STATUS.PENDING];
         }
 
         let currentMonthIndex = null;
@@ -402,8 +393,8 @@
         }
 
         function toggleOverdueStatus(monthIndex, currentStatus) {
-            const newStatus = currentStatus === 'OVERDUE' ? 'PENDING' : 'OVERDUE';
-            const actionText = currentStatus === 'OVERDUE' ? '取消逾期' : '标记为逾期';
+            const newStatus = currentStatus === STATUS.OVERDUE ? STATUS.PENDING : STATUS.OVERDUE;
+            const actionText = currentStatus === STATUS.OVERDUE ? '取消逾期' : '标记为逾期';
             
             if (!confirm(`确定要将第 ${monthIndex} 期${actionText}吗？`)) {
                 return;
@@ -434,6 +425,32 @@
                 console.error('Error:', error);
                 alert('更新状态失败: ' + error.message);
             });
+        }
+
+        function renderPaymentButton(payment) {
+            return `
+                <button class="btn btn-sm btn-primary payment-btn" 
+                        onclick="showPaymentModal(${payment.monthIndex})"
+                        ${payment.status === STATUS.PAID ? 'disabled' : ''}>
+                    <i class="bi bi-plus-circle"></i> 还款
+                </button>
+            `;
+        }
+
+        function renderStatusCell(payment) {
+            return `
+                <td class="status-cell">
+                    <span class="badge ${getStatusBadgeClass(payment.status)} status-badge">
+                        ${payment.statusDescription}
+                    </span>
+                    <button class="btn btn-sm btn-danger overdue-btn" 
+                            onclick="toggleOverdueStatus(${payment.monthIndex}, '${payment.status}')"
+                            ${payment.status === STATUS.PAID ? 'disabled' : ''}>
+                        <i class="bi bi-exclamation-triangle"></i>
+                        ${payment.status === STATUS.OVERDUE ? '取消逾期' : '标记逾期'}
+                    </button>
+                </td>
+            `;
         }
     </script>
     <!-- 添加隐藏的input用于存储ID -->

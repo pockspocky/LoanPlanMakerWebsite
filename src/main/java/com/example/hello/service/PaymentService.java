@@ -18,6 +18,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PaymentService {
 
+    // 定义状态常量
+    private static final String STATUS_OVERDUE = "OVERDUE";
+    private static final String STATUS_PENDING = "PENDING";
+    private static final String STATUS_PAID = "PAID";
+
+    // 定义还款方式常量
+    private static final String METHOD_EQUAL_INSTALLMENT = "等额本息";
+    private static final String METHOD_EQUAL_PRINCIPAL = "等额本金";
+    private static final String METHOD_INTEREST_FIRST = "先息后本";
+    private static final String METHOD_ONE_TIME = "一次性还本付息";
+
     @Autowired
     private LoanItemRepository loanItemRepository;
     
@@ -217,18 +228,18 @@ public class PaymentService {
     
     private String getStatusDescription(String status) {
         switch (status) {
-            case "OVERDUE": return "逾期";
-            case "PENDING": return "待还";
-            case "PAID": return "已还完";
+            case STATUS_OVERDUE: return "逾期";
+            case STATUS_PENDING: return "待还";
+            case STATUS_PAID: return "已还完";
             default: return "待还";
         }
     }
     
     private String getInitialStatus(LocalDate dueDate, LocalDate now) {
         if (dueDate.isBefore(now)) {
-            return "OVERDUE";
+            return STATUS_OVERDUE;
         } else {
-            return "PENDING";
+            return STATUS_PENDING;
         }
     }
 
@@ -243,9 +254,9 @@ public class PaymentService {
         
         // 更新状态
         if (newAmount.compareTo(payment.getPlannedAmount()) == 0) {
-            payment.setStatus("PAID");
+            payment.setStatus(STATUS_PAID);
         } else if (newAmount.compareTo(payment.getPlannedAmount()) < 0) {
-            payment.setStatus("PENDING");
+            payment.setStatus(STATUS_PENDING);
         } else if (newAmount.compareTo(payment.getPlannedAmount()) > 0) {
             throw new RuntimeException("还款金额不能超过计划还款金额");
         }
@@ -261,7 +272,7 @@ public class PaymentService {
         MonthlyPayment payment = monthlyPaymentRepository.findByLoanItemIdAndMonthIndex(loanItemId, monthIndex)
             .orElseThrow(() -> new RuntimeException("找不到对应的还款记录"));
             
-        if (payment.getStatus().equals("PAID")) {
+        if (payment.getStatus().equals(STATUS_PAID)) {
             throw new RuntimeException("已还完的记录不能修改状态");
         }
         
