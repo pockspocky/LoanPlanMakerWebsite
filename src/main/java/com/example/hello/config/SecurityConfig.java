@@ -32,6 +32,7 @@ public class SecurityConfig {
                 .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico").permitAll()
                 .requestMatchers("/login", "/register", "/error").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers("/user-management", "/api/users/**", "/user/*/loans").hasRole("ADMIN")
                 .requestMatchers("/api/loan-items/**").authenticated()
                 .anyRequest().authenticated()
             )
@@ -43,7 +44,11 @@ public class SecurityConfig {
                 .permitAll()
             )
             .logout(logout -> logout
+                .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .clearAuthentication(true)
                 .permitAll()
             );
         
