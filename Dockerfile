@@ -1,4 +1,4 @@
-FROM docker.mirrors.sjtug.sjtu.edu.cn/library/openjdk:17-slim AS builder
+FROM docker.tuna.tsinghua.edu.cn/library/openjdk:17-slim AS builder
 
 WORKDIR /build
 COPY pom.xml .
@@ -10,7 +10,7 @@ COPY src ./src
 RUN mvn package -DskipTests
 
 # 运行阶段
-FROM docker.mirrors.sjtug.sjtu.edu.cn/library/openjdk:17-slim
+FROM docker.tuna.tsinghua.edu.cn/library/openjdk:17-slim
 
 WORKDIR /app
 
