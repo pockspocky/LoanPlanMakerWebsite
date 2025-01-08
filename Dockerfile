@@ -10,7 +10,7 @@ COPY src ./src
 RUN mvn package -DskipTests
 
 # 运行阶段
-FROM docker.tuna.tsinghua.edu.cn/library/openjdk:17-slim
+FROM swr.cn-north-4.myhuaweicloud.com/openjdk/openjdk:17-jre
 
 WORKDIR /app
 
