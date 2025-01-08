@@ -1,20 +1,21 @@
-FROM maven:3.9-amazoncorretto-17 AS builder
+FROM openjdk:17-slim AS builder
 
 WORKDIR /build
 COPY pom.xml .
 # 缓存Maven依赖
+RUN apt-get update && apt-get install -y maven
 RUN mvn dependency:go-offline
 
 COPY src ./src
 RUN mvn package -DskipTests
 
 # 运行阶段
-FROM amazoncorretto:17-alpine
+FROM openjdk:17-slim
 
 WORKDIR /app
 
 # 安装必要的工具
-RUN apk add --no-cache curl
+RUN apt-get update && apt-get install -y curl
 
 # 复制构建产物
 COPY --from=builder /build/target/*.jar app.jar
