@@ -1,5 +1,5 @@
 # 使用 JDK 17 作为基础镜像
-FROM registry.cn-hangzhou.aliyuncs.com/library/openjdk:17-slim
+FROM amazoncorretto:17-alpine
 
 # 设置工作目录
 WORKDIR /app
