@@ -1,4 +1,4 @@
-FROM ccr.ccs.tencentyun.com/library/openjdk:17-slim AS builder
+FROM registry.cn-beijing.aliyuncs.com/openjdk/openjdk:17-slim AS builder
 
 WORKDIR /build
 COPY pom.xml .
