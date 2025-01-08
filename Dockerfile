@@ -1,4 +1,4 @@
-FROM openjdk:17-slim AS builder
+FROM registry.cn-hangzhou.aliyuncs.com/library/openjdk:17-slim AS builder
 
 WORKDIR /build
 COPY pom.xml .
@@ -10,7 +10,7 @@ COPY src ./src
 RUN mvn package -DskipTests
 
 # 运行阶段
-FROM openjdk:17-slim
+FROM registry.cn-hangzhou.aliyuncs.com/library/openjdk:17-slim
 
 WORKDIR /app
 
