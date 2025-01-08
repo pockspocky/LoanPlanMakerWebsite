@@ -1,4 +1,4 @@
-FROM registry.cn-beijing.aliyuncs.com/openjdk/openjdk:17-slim AS builder
+FROM mirror.tuna.tsinghua.edu.cn/openjdk:17-slim AS builder
 
 WORKDIR /build
 COPY pom.xml .
