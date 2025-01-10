@@ -5,6 +5,7 @@ com/example/hello/controller/DashboardController.class
 com/example/hello/repository/LoanItemRepository.class
 com/example/hello/entity/LoanItem.class
 com/example/hello/service/UserService.class
+com/example/hello/config/ScheduledRestartConfig.class
 com/example/hello/repository/UserRepository.class
 com/example/hello/dto/MonthlyPaymentDTO.class
 com/example/hello/dto/PaymentSummaryResponse.class

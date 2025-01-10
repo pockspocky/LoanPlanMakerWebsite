@@ -2,9 +2,15 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>贷款详情 - 贷款管理系统</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- 预加载关键资源 -->
+    <link rel="preload" th:href="@{/css/bootstrap.min.css}" as="style">
+    <link rel="preload" th:href="@{/css/bootstrap-icons.css}" as="style">
+    <!-- CSS 资源 -->
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
+    <!-- 内联关键CSS -->
     <style>
         .top-bar {
             background-color: #212529;
@@ -138,9 +144,42 @@
         .overdue-btn i {
             margin-right: 4px;
         }
+        /* 添加加载状态样式 */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        [v-cloak] {
+            display: none;
+        }
     </style>
 </head>
 <body>
+    <!-- 添加加载指示器 -->
+    <div id="loading" class="loading" style="display: none;">
+        <div class="loading-spinner"></div>
+    </div>
+
     <!-- 顶部导航栏 -->
     <div class="top-bar">
         <div class="container">
@@ -216,70 +255,132 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        // 显示加载状态
+        function showLoading() {
+            document.getElementById('loading').style.display = 'flex';
+        }
+
+        // 隐藏加载状态
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // 错误处理函数
+        function handleError(error) {
+            console.error('Error:', error);
+            alert('操作失败: ' + error.message);
+            hideLoading();
+        }
+
+        // 数据格式化函数
+        function formatCurrency(amount) {
+            return amount.toLocaleString('zh-CN', {
+                style: 'currency',
+                currency: 'CNY'
+            });
+        }
+
+        // 防抖函数
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // 初始化函数
+        async function initializePage() {
             const loanId = document.getElementById('loanId').value;
             const userId = document.getElementById('userId').value;
             
-            // 调用还款汇总信息接口
-            fetch(`/api/loan-items/${loanId}/payment-summary?userId=${userId}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('获取还款信息失败');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // 输出完整的返回数据到控制台
-                    console.log('还款汇总信息:', {
-                        贷款本金: data.loanAmount,
-                        本息合计: data.totalAmount,
-                        总利息: data.totalInterest,
-                        已还总额: data.totalPaid,
-                        剩余应还: data.remainingAmount,
-                        完成率: data.completionRate + '%',
-                        月度还款计划: data.monthlyPayments
-                    });
-                    
-                    // 更新圆形进度条
+            try {
+                showLoading();
+                const response = await fetch(`/api/loan-items/${loanId}/payment-summary?userId=${userId}`);
+                if (!response.ok) {
+                    throw new Error('获取还款信息失败');
+                }
+                const data = await response.json();
+                
+                // 使用 requestAnimationFrame 优化视图更新
+                requestAnimationFrame(() => {
                     updateProgressCircle(data.completionRate);
-                    // 更新还款信息
                     updatePaymentInfo(data);
-                    // 更新还款计划表
                     updateMonthlyPayments(data.monthlyPayments);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('获取还款信息失败: ' + error.message);
+                    hideLoading();
                 });
-        });
-        
+            } catch (error) {
+                handleError(error);
+            }
+        }
+
+        // 优化的更新函数
         function updateProgressCircle(percentage) {
-            const circle = document.querySelector('.progress-circle');
-            const percentageSpan = document.querySelector('.percentage');
-            const label = document.querySelector('.label');
-            
-            // 使用CSS变量设置进度
-            circle.style.setProperty('--progress', `${percentage}%`);
-            
-            // 更新百分比文本
-            percentageSpan.textContent = percentage.toFixed(1) + '%';
-            label.textContent = '还款进度';
+            requestAnimationFrame(() => {
+                const circle = document.querySelector('.progress-circle');
+                const percentageSpan = document.querySelector('.percentage');
+                circle.style.setProperty('--progress', `${percentage}%`);
+                percentageSpan.textContent = percentage.toFixed(1) + '%';
+            });
         }
-        
+
         function updatePaymentInfo(data) {
-            const loanInfo = document.querySelector('.loan-info .row');
-            loanInfo.innerHTML = `
-                <div class="col-md-6">
-                    <p><strong>已还金额：</strong> ¥${data.totalPaid.toLocaleString('zh-CN')}</p>
-                    <p><strong>剩余应还：</strong> ¥${data.remainingAmount.toLocaleString('zh-CN')}</p>
-                    <p><strong>总利息：</strong> ¥${data.totalInterest.toLocaleString('zh-CN')}</p>
-                </div>
-                <div class="col-md-6">
-                    <p><strong>贷款本金：</strong> ¥${data.loanAmount.toLocaleString('zh-CN')}</p>
-                    <p><strong>本息合计：</strong> ¥${data.totalAmount.toLocaleString('zh-CN')}</p>
-                </div>
-            `;
+            requestAnimationFrame(() => {
+                const loanInfo = document.querySelector('.loan-info .row');
+                loanInfo.innerHTML = `
+                    <div class="col-md-6">
+                        <p><strong>已还金额：</strong> ${formatCurrency(data.totalPaid)}</p>
+                        <p><strong>剩余应还：</strong> ${formatCurrency(data.remainingAmount)}</p>
+                        <p><strong>总利息：</strong> ${formatCurrency(data.totalInterest)}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>贷款本金：</strong> ${formatCurrency(data.loanAmount)}</p>
+                        <p><strong>本息合计：</strong> ${formatCurrency(data.totalAmount)}</p>
+                    </div>
+                `;
+            });
         }
+
+        // 优化的事件处理函数
+        const debouncedSubmitPayment = debounce(async () => {
+            const amount = parseFloat(document.getElementById('paymentAmount').value);
+            if (isNaN(amount) || amount <= 0) {
+                alert('请输入有效的还款金额');
+                return;
+            }
+
+            try {
+                showLoading();
+                const response = await fetch(`/api/loan-items/${loanId}/monthly-payment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        monthIndex: currentMonthIndex,
+                        amount: amount
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('还款失败');
+                }
+
+                await response.json();
+                alert('还款成功！');
+                closePaymentModal();
+                window.location.reload();
+            } catch (error) {
+                handleError(error);
+            }
+        }, 300);
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initializePage);
 
         let monthlyPayments = [];
         
