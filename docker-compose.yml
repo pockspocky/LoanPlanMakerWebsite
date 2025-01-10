@@ -6,16 +6,24 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/loan_db?useSSL=false&allowPublicKeyRetrieval=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
+      - MYSQL_URL=jdbc:mysql://mysql:3306/loan_db?useSSL=false&allowPublicKeyRetrieval=true&autoReconnect=true&failOverReadOnly=false&maxReconnects=10
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - HIKARI_MAXIMUM_POOL_SIZE=10
+      - HIKARI_MINIMUM_IDLE=5
     depends_on:
       mysql:
         condition: service_healthy
     networks:
       - app-network
     restart: unless-stopped
+    deploy:
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
 
   mysql:
     image: mysql:8.0
@@ -34,6 +42,12 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+    deploy:
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
 
 volumes:
   mysql-data:

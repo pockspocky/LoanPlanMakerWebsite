@@ -1,6 +1,7 @@
 /home/devbox/project/src/main/java/com/example/hello/HelloApplication.java
 /home/devbox/project/src/main/java/com/example/hello/config/JpaConfig.java
 /home/devbox/project/src/main/java/com/example/hello/config/PasswordEncoderConfig.java
+/home/devbox/project/src/main/java/com/example/hello/config/ScheduledRestartConfig.java
 /home/devbox/project/src/main/java/com/example/hello/config/SecurityConfig.java
 /home/devbox/project/src/main/java/com/example/hello/controller/AuthController.java
 /home/devbox/project/src/main/java/com/example/hello/controller/DashboardController.java
